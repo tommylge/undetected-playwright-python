@@ -4,11 +4,11 @@
 
 This is a patch of the original playwright implementation for Python.
 
-|          | Linux | macOS | Windows |
-|   :---   | :---: | :---: | :---:   |
-| Chromium <!-- GEN:chromium-version -->120.0.6099.28<!-- GEN:stop --> | ✅ | ✅ | ✅ |
-| WebKit <!-- GEN:webkit-version -->17.4<!-- GEN:stop --> | ✅ | ✅ | ✅ |
-| Firefox <!-- GEN:firefox-version -->119.0<!-- GEN:stop --> | ✅ | ✅ | ✅ |
+It currently passes for sure (tested on Win10):
+- ✅ [CloudFare] 
+- ✅ [Bet365] (shape//F5 I think)
+- [Others] Unknown/Not tested
+
 Warnings: 
 * the **Only chromium** part for Playwright is patched.
 * This will overwrite your default playwright package.
