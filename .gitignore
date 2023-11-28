@@ -1,4 +1,7 @@
 **/__pycache__/
+.mypy_cache
+.venv
+undetected_playwright_patch.egg-info
 driver/
 playwright/driver/
 playwright.egg-info/

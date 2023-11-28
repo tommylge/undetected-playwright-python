@@ -102,5 +102,5 @@ def main(build: bool = True, build_all: bool = False, ):
 if __name__ == "__main__":
     main(build=True, build_all=False)
 
-    loop = asyncio.ProactorEventLoop()
+    loop = asyncio.SelectorEventLoop()
     loop.run_until_complete(patch_check_main())
