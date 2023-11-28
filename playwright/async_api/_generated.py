@@ -42,7 +42,6 @@ from playwright._impl._api_structures import (
     StorageState,
     ViewportSize,
 )
-from playwright._impl._api_types import Error
 from playwright._impl._assertions import (
     APIResponseAssertions as APIResponseAssertionsImpl,
 )
@@ -62,6 +61,7 @@ from playwright._impl._console_message import ConsoleMessage as ConsoleMessageIm
 from playwright._impl._dialog import Dialog as DialogImpl
 from playwright._impl._download import Download as DownloadImpl
 from playwright._impl._element_handle import ElementHandle as ElementHandleImpl
+from playwright._impl._errors import Error
 from playwright._impl._fetch import APIRequest as APIRequestImpl
 from playwright._impl._fetch import APIRequestContext as APIRequestContextImpl
 from playwright._impl._fetch import APIResponse as APIResponseImpl
@@ -1920,13 +1920,16 @@ class ElementHandle(JSHandle):
         properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
         Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
+        - [DeviceMotionEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent/DeviceMotionEvent)
+        - [DeviceOrientationEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent/DeviceOrientationEvent)
         - [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent/DragEvent)
+        - [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
         - [FocusEvent](https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent/FocusEvent)
         - [KeyboardEvent](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/KeyboardEvent)
         - [MouseEvent](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/MouseEvent)
         - [PointerEvent](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent/PointerEvent)
         - [TouchEvent](https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/TouchEvent)
-        - [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
+        - [WheelEvent](https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent/WheelEvent)
 
         You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
 
@@ -4102,13 +4105,16 @@ class Frame(AsyncBase):
         properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
         Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
+        - [DeviceMotionEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent/DeviceMotionEvent)
+        - [DeviceOrientationEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent/DeviceOrientationEvent)
         - [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent/DragEvent)
+        - [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
         - [FocusEvent](https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent/FocusEvent)
         - [KeyboardEvent](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/KeyboardEvent)
         - [MouseEvent](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/MouseEvent)
         - [PointerEvent](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent/PointerEvent)
         - [TouchEvent](https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/TouchEvent)
-        - [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
+        - [WheelEvent](https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent/WheelEvent)
 
         You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
 
@@ -7241,18 +7247,18 @@ class Download(AsyncBase):
 
         return mapping.from_maybe_impl(await self._impl_obj.failure())
 
-    async def path(self) -> typing.Optional[pathlib.Path]:
+    async def path(self) -> pathlib.Path:
         """Download.path
 
-        Returns path to the downloaded file in case of successful download. The method will wait for the download to finish
-        if necessary. The method throws when connected remotely.
+        Returns path to the downloaded file for a successful download, or throws for a failed/canceled download. The method
+        will wait for the download to finish if necessary. The method throws when connected remotely.
 
         Note that the download's file name is a random GUID, use `download.suggested_filename()` to get suggested
         file name.
 
         Returns
         -------
-        Union[pathlib.Path, None]
+        pathlib.Path
         """
 
         return mapping.from_maybe_impl(await self._impl_obj.path())
@@ -8543,13 +8549,16 @@ class Page(AsyncContextManager):
         properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
         Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
+        - [DeviceMotionEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent/DeviceMotionEvent)
+        - [DeviceOrientationEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent/DeviceOrientationEvent)
         - [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent/DragEvent)
+        - [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
         - [FocusEvent](https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent/FocusEvent)
         - [KeyboardEvent](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/KeyboardEvent)
         - [MouseEvent](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/MouseEvent)
         - [PointerEvent](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent/PointerEvent)
         - [TouchEvent](https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/TouchEvent)
-        - [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
+        - [WheelEvent](https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent/WheelEvent)
 
         You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
 
@@ -9025,7 +9034,7 @@ class Page(AsyncContextManager):
 
         async def run(playwright: Playwright):
             webkit = playwright.webkit
-            browser = await webkit.launch(headless=false)
+            browser = await webkit.launch(headless=False)
             context = await browser.new_context()
             page = await context.new_page()
             await page.expose_binding(\"pageURL\", lambda source: source[\"page\"].url)
@@ -9051,7 +9060,7 @@ class Page(AsyncContextManager):
 
         def run(playwright: Playwright):
             webkit = playwright.webkit
-            browser = webkit.launch(headless=false)
+            browser = webkit.launch(headless=False)
             context = browser.new_context()
             page = context.new_page()
             page.expose_binding(\"pageURL\", lambda source: source[\"page\"].url)
@@ -9999,7 +10008,12 @@ class Page(AsyncContextManager):
 
         return mapping.from_maybe_impl(await self._impl_obj.title())
 
-    async def close(self, *, run_before_unload: typing.Optional[bool] = None) -> None:
+    async def close(
+        self,
+        *,
+        run_before_unload: typing.Optional[bool] = None,
+        reason: typing.Optional[str] = None
+    ) -> None:
         """Page.close
 
         If `runBeforeUnload` is `false`, does not run any unload handlers and waits for the page to be closed. If
@@ -10015,10 +10029,12 @@ class Page(AsyncContextManager):
         run_before_unload : Union[bool, None]
             Defaults to `false`. Whether to run the
             [before unload](https://developer.mozilla.org/en-US/docs/Web/Events/beforeunload) page handlers.
+        reason : Union[str, None]
+            The reason to be reported to the operations interrupted by the page closure.
         """
 
         return mapping.from_maybe_impl(
-            await self._impl_obj.close(runBeforeUnload=run_before_unload)
+            await self._impl_obj.close(runBeforeUnload=run_before_unload, reason=reason)
         )
 
     def is_closed(self) -> bool:
@@ -13303,7 +13319,7 @@ class BrowserContext(AsyncContextManager):
 
         async def run(playwright: Playwright):
             webkit = playwright.webkit
-            browser = await webkit.launch(headless=false)
+            browser = await webkit.launch(headless=False)
             context = await browser.new_context()
             await context.expose_binding(\"pageURL\", lambda source: source[\"page\"].url)
             page = await context.new_page()
@@ -13329,7 +13345,7 @@ class BrowserContext(AsyncContextManager):
 
         def run(playwright: Playwright):
             webkit = playwright.webkit
-            browser = webkit.launch(headless=false)
+            browser = webkit.launch(headless=False)
             context = browser.new_context()
             context.expose_binding(\"pageURL\", lambda source: source[\"page\"].url)
             page = context.new_page()
@@ -13726,15 +13742,20 @@ class BrowserContext(AsyncContextManager):
             ).future
         )
 
-    async def close(self) -> None:
+    async def close(self, *, reason: typing.Optional[str] = None) -> None:
         """BrowserContext.close
 
         Closes the browser context. All the pages that belong to the browser context will be closed.
 
         **NOTE** The default browser context cannot be closed.
+
+        Parameters
+        ----------
+        reason : Union[str, None]
+            The reason to be reported to the operations interrupted by the context closure.
         """
 
-        return mapping.from_maybe_impl(await self._impl_obj.close())
+        return mapping.from_maybe_impl(await self._impl_obj.close(reason=reason))
 
     async def storage_state(
         self, *, path: typing.Optional[typing.Union[str, pathlib.Path]] = None
@@ -14462,7 +14483,7 @@ class Browser(AsyncContextManager):
             )
         )
 
-    async def close(self) -> None:
+    async def close(self, *, reason: typing.Optional[str] = None) -> None:
         """Browser.close
 
         In case this browser is obtained using `browser_type.launch()`, closes the browser and all of its pages (if
@@ -14476,9 +14497,14 @@ class Browser(AsyncContextManager):
         `browser.close()`.
 
         The `Browser` object itself is considered to be disposed and cannot be used anymore.
+
+        Parameters
+        ----------
+        reason : Union[str, None]
+            The reason to be reported to the operations interrupted by the browser closure.
         """
 
-        return mapping.from_maybe_impl(await self._impl_obj.close())
+        return mapping.from_maybe_impl(await self._impl_obj.close(reason=reason))
 
     async def new_browser_cdp_session(self) -> "CDPSession":
         """Browser.new_browser_cdp_session
@@ -14779,6 +14805,9 @@ class BrowserType(AsyncBase):
         accept_downloads: typing.Optional[bool] = None,
         traces_dir: typing.Optional[typing.Union[str, pathlib.Path]] = None,
         chromium_sandbox: typing.Optional[bool] = None,
+        firefox_user_prefs: typing.Optional[
+            typing.Dict[str, typing.Union[str, float, bool]]
+        ] = None,
         record_har_path: typing.Optional[typing.Union[str, pathlib.Path]] = None,
         record_har_omit_content: typing.Optional[bool] = None,
         record_video_dir: typing.Optional[typing.Union[str, pathlib.Path]] = None,
@@ -14914,6 +14943,9 @@ class BrowserType(AsyncBase):
             If specified, traces are saved into this directory.
         chromium_sandbox : Union[bool, None]
             Enable Chromium sandboxing. Defaults to `false`.
+        firefox_user_prefs : Union[Dict[str, Union[bool, float, str]], None]
+            Firefox user preferences. Learn more about the Firefox user preferences at
+            [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
         record_har_path : Union[pathlib.Path, str, None]
             Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into the specified HAR file
             on the filesystem. If not specified, the HAR is not recorded. Make sure to call `browser_context.close()`
@@ -15001,6 +15033,7 @@ class BrowserType(AsyncBase):
                 acceptDownloads=accept_downloads,
                 tracesDir=traces_dir,
                 chromiumSandbox=chromium_sandbox,
+                firefoxUserPrefs=mapping.to_impl(firefox_user_prefs),
                 recordHarPath=record_har_path,
                 recordHarOmitContent=record_har_omit_content,
                 recordVideoDir=record_video_dir,
@@ -15787,13 +15820,16 @@ class Locator(AsyncBase):
         properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
         Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
+        - [DeviceMotionEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent/DeviceMotionEvent)
+        - [DeviceOrientationEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent/DeviceOrientationEvent)
         - [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent/DragEvent)
+        - [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
         - [FocusEvent](https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent/FocusEvent)
         - [KeyboardEvent](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/KeyboardEvent)
         - [MouseEvent](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/MouseEvent)
         - [PointerEvent](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent/PointerEvent)
         - [TouchEvent](https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/TouchEvent)
-        - [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
+        - [WheelEvent](https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent/WheelEvent)
 
         You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
 
@@ -18368,8 +18404,8 @@ class APIRequestContext(AsyncBase):
         """APIRequestContext.dispose
 
         All responses returned by `a_pi_request_context.get()` and similar methods are stored in the memory, so that
-        you can later call `a_pi_response.body()`. This method discards all stored responses, and makes
-        `a_pi_response.body()` throw \"Response disposed\" error.
+        you can later call `a_pi_response.body()`.This method discards all its resources, calling any method on
+        disposed `APIRequestContext` will throw an exception.
         """
 
         return mapping.from_maybe_impl(await self._impl_obj.dispose())
@@ -19260,6 +19296,11 @@ class LocatorAssertions(AsyncBase):
         Ensures the `Locator` points to an element that contains the given text. You can use regular expressions for the
         value as well.
 
+        **Details**
+
+        When `expected` parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
+        text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
+
         **Usage**
 
         ```py
@@ -19399,6 +19440,7 @@ class LocatorAssertions(AsyncBase):
         name: str,
         value: typing.Union[str, typing.Pattern[str]],
         *,
+        ignore_case: typing.Optional[bool] = None,
         timeout: typing.Optional[float] = None
     ) -> None:
         """LocatorAssertions.to_have_attribute
@@ -19427,6 +19469,9 @@ class LocatorAssertions(AsyncBase):
             Attribute name.
         value : Union[Pattern[str], str]
             Expected attribute value.
+        ignore_case : Union[bool, None]
+            Whether to perform case-insensitive match. `ignoreCase` option takes precedence over the corresponding regular
+            expression flag if specified.
         timeout : Union[float, None]
             Time to retry the assertion for in milliseconds. Defaults to `5000`.
         """
@@ -19434,7 +19479,7 @@ class LocatorAssertions(AsyncBase):
 
         return mapping.from_maybe_impl(
             await self._impl_obj.to_have_attribute(
-                name=name, value=value, timeout=timeout
+                name=name, value=value, ignore_case=ignore_case, timeout=timeout
             )
         )
 
@@ -19443,6 +19488,7 @@ class LocatorAssertions(AsyncBase):
         name: str,
         value: typing.Union[str, typing.Pattern[str]],
         *,
+        ignore_case: typing.Optional[bool] = None,
         timeout: typing.Optional[float] = None
     ) -> None:
         """LocatorAssertions.not_to_have_attribute
@@ -19455,6 +19501,9 @@ class LocatorAssertions(AsyncBase):
             Attribute name.
         value : Union[Pattern[str], str]
             Expected attribute value.
+        ignore_case : Union[bool, None]
+            Whether to perform case-insensitive match. `ignoreCase` option takes precedence over the corresponding regular
+            expression flag if specified.
         timeout : Union[float, None]
             Time to retry the assertion for in milliseconds. Defaults to `5000`.
         """
@@ -19462,7 +19511,7 @@ class LocatorAssertions(AsyncBase):
 
         return mapping.from_maybe_impl(
             await self._impl_obj.not_to_have_attribute(
-                name=name, value=value, timeout=timeout
+                name=name, value=value, ignore_case=ignore_case, timeout=timeout
             )
         )
 
@@ -19992,6 +20041,11 @@ class LocatorAssertions(AsyncBase):
 
         Ensures the `Locator` points to an element with the given text. You can use regular expressions for the value as
         well.
+
+        **Details**
+
+        When `expected` parameter is a string, Playwright will normalize whitespaces and line breaks both in the actual
+        text and in the expected string before matching. When regular expression is used, the actual text is matched as is.
 
         **Usage**
 

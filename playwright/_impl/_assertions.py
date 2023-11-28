@@ -16,6 +16,7 @@ from typing import Any, List, Optional, Pattern, Union
 from urllib.parse import urljoin
 
 from playwright._impl._api_structures import ExpectedTextValue, FrameExpectOptions
+from playwright._impl._connection import format_call_log
 from playwright._impl._fetch import APIResponse
 from playwright._impl._helper import is_textual_mime_type
 from playwright._impl._locator import Locator
@@ -56,9 +57,6 @@ class AssertionsBase:
         result = await self._actual_locator._expect(expression, expect_options)
         if result["matches"] == self._is_not:
             actual = result.get("received")
-            log = "\n".join(result.get("log", "")).strip()
-            if log:
-                log = "\nCall log:\n" + log
             if self._custom_message:
                 out_message = self._custom_message
                 if expected is not None:
@@ -67,7 +65,9 @@ class AssertionsBase:
                 out_message = (
                     f"{message} '{expected}'" if expected is not None else f"{message}"
                 )
-            raise AssertionError(f"{out_message}\nActual value: {actual} {log}")
+            raise AssertionError(
+                f"{out_message}\nActual value: {actual} {format_call_log(result.get('log'))}"
+            )
 
 
 class PageAssertions(AssertionsBase):
@@ -215,10 +215,11 @@ class LocatorAssertions(AssertionsBase):
         self,
         name: str,
         value: Union[str, Pattern[str]],
+        ignore_case: bool = None,
         timeout: float = None,
     ) -> None:
         __tracebackhide__ = True
-        expected_text = to_expected_text_values([value])
+        expected_text = to_expected_text_values([value], ignore_case=ignore_case)
         await self._expect_impl(
             "to.have.attribute.value",
             FrameExpectOptions(
@@ -232,10 +233,13 @@ class LocatorAssertions(AssertionsBase):
         self,
         name: str,
         value: Union[str, Pattern[str]],
+        ignore_case: bool = None,
         timeout: float = None,
     ) -> None:
         __tracebackhide__ = True
-        await self._not.to_have_attribute(name, value, timeout)
+        await self._not.to_have_attribute(
+            name, value, ignore_case=ignore_case, timeout=timeout
+        )
 
     async def to_have_class(
         self,
@@ -720,10 +724,7 @@ class APIResponseAssertions:
         if self._is_not:
             message = message.replace("expected to", "expected not to")
         out_message = self._custom_message or message
-        log_list = await self._actual._fetch_log()
-        log = "\n".join(log_list).strip()
-        if log:
-            out_message += f"\n Call log:\n{log}"
+        out_message += format_call_log(await self._actual._fetch_log())
 
         content_type = self._actual.headers.get("content-type")
         is_text_encoding = content_type and is_textual_mime_type(content_type)

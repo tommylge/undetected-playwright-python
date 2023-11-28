@@ -20,6 +20,7 @@ import pytest
 
 from playwright.async_api import BrowserContext, Error, Page, Route, TimeoutError
 from tests.server import Server
+from tests.utils import TARGET_CLOSED_ERROR_MESSAGE
 
 
 async def test_close_should_reject_all_promises(context):
@@ -28,7 +29,7 @@ async def test_close_should_reject_all_promises(context):
         await asyncio.gather(
             new_page.evaluate("() => new Promise(r => {})"), new_page.close()
         )
-    assert "Target closed" in exc_info.value.message
+    assert " closed" in exc_info.value.message
 
 
 async def test_closed_should_not_visible_in_context_pages(context):
@@ -112,7 +113,7 @@ async def test_close_should_terminate_network_waiters(context, server):
     )
     for i in range(2):
         error = results[i]
-        assert "Page closed" in error.message
+        assert TARGET_CLOSED_ERROR_MESSAGE in error.message
         assert "Timeout" not in error.message
 
 
@@ -269,7 +270,7 @@ async def test_wait_for_event_should_fail_with_error_upon_disconnect(page):
     with pytest.raises(Error) as exc_info:
         async with page.expect_download():
             await page.close()
-    assert "Page closed" in exc_info.value.message
+    assert TARGET_CLOSED_ERROR_MESSAGE in exc_info.value.message
 
 
 async def test_wait_for_response_should_work(page, server):
@@ -1294,3 +1295,33 @@ async def test_expose_binding_should_serialize_cycles(page: Page):
     await page.expose_binding("log", lambda source, o: binding(source, o))
     await page.evaluate("const a = {}; a.b = a; window.log(a)")
     assert binding_values[0]["b"] == binding_values[0]
+
+
+async def test_page_pause_should_reset_default_timeouts(
+    page: Page, headless: bool, server: Server
+) -> None:
+    if not headless:
+        pytest.skip()
+
+    await page.goto(server.EMPTY_PAGE)
+    page.pause()
+    with pytest.raises(Error, match="Timeout 30000ms exceeded."):
+        await page.get_by_text("foo").click()
+
+
+async def test_page_pause_should_reset_custom_timeouts(
+    page: Page, headless: bool, server: Server
+) -> None:
+    if not headless:
+        pytest.skip()
+
+    page.set_default_timeout(123)
+    page.set_default_navigation_timeout(456)
+    await page.goto(server.EMPTY_PAGE)
+    page.pause()
+    with pytest.raises(Error, match="Timeout 123ms exceeded."):
+        await page.get_by_text("foo").click()
+
+    server.set_route("/empty.html", lambda route: None)
+    with pytest.raises(Error, match="Timeout 456ms exceeded."):
+        await page.goto(server.EMPTY_PAGE)
